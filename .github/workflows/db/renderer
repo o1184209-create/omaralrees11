@@ -1,0 +1,54 @@
+<!doctype html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8">
+<title>نظام إدارة النزلاء</title>
+<style>
+body{font-family:Tahoma;background:#eaf2ff;padding:20px;color:#003f87}
+.card{background:white;padding:15px;margin-bottom:10px;border-radius:8px}
+input,button{padding:8px;margin:6px 0;width:100%}
+button{background:#003f87;color:white;border:none;border-radius:4px;cursor:pointer}
+table{width:100%;border-collapse:collapse;}
+th,td{border-bottom:1px solid #ddd;padding:6px}
+</style>
+</head>
+<body>
+<h2>إدارة النزلاء (SQLCipher)</h2>
+
+<div class="card">
+<form id="frm">
+<input name="full_name" placeholder="الاسم الكامل">
+<input name="prison_number" placeholder="الرقم السجني">
+<input name="law_article" placeholder="المادة القانونية">
+<button>إضافة</button>
+</form>
+</div>
+
+<div class="card">
+<h3>القائمة</h3>
+<div id="list"></div>
+</div>
+
+<script>
+async function load(){
+ let r = await fetch("http://localhost:3000/api/inmates");
+ let d = await r.json();
+ let h = "<table><tr><th>الاسم</th><th>الرقم</th><th>المادة</th></tr>";
+ d.forEach(x=> h+=`<tr><td>${x.full_name}</td><td>${x.prison_number}</td><td>${x.law_article}</td></tr>`);
+ h+="</table>";
+ document.getElementById("list").innerHTML = h;
+}
+
+document.getElementById("frm").onsubmit = async e=>{
+ e.preventDefault();
+ let fd = new FormData(e.target);
+ let o = {}; fd.forEach((v,k)=> o[k]=v);
+ await fetch("http://localhost:3000/api/inmates",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(o)});
+ e.target.reset();
+ load();
+};
+
+load();
+</script>
+</body>
+</html>
